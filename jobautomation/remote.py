@@ -4,6 +4,36 @@ from getpass import getpass
 import datetime
 import math
 
+#paramiko patch
+import paramiko
+
+
+def monkey_patch():
+    paramiko.SSHClient.exec_command = _patched_exec_command
+
+
+def _patched_exec_command(
+        self,
+        command: str,
+        bufsize: int = -1,
+        timeout: int = None,
+        get_pty: bool = False,
+        environment: dict = None,
+) -> tuple:
+
+    chan = self._transport.open_session(timeout=timeout)
+    if get_pty:
+        chan.get_pty()
+    chan.settimeout(timeout)
+    if environment:
+        chan.update_environment(environment)
+    chan.exec_command(command)
+    stdin = chan.makefile('wb', bufsize)
+    stdout = chan.makefile('rb', bufsize)
+    stderr = chan.makefile_stderr('rb', bufsize)
+    return stdin, stdout, stderr
+
+
 #send several directlies at one time, avoid typing passphrase so many times...
 def sendDirsToIMR(dirs, vaspfiles):
 
@@ -126,34 +156,33 @@ def jobStateIMR(log, reqfiles):
 
     sftp = ssh.open_sftp()
 
-    jobstatusCommand="statj"
+    #change to patched paramiko
+    #monkey_patch()
 
-    finishedJobStatusCommand="statj -x"
+
+
 
     runningJobID=[]
 
+    #in IMR, get command result from stdout sometimes difficult
+    lf="jobstatus-"+str(datetime.date.today())+".txt"
+    jobstatusCommand = "qstat -u emi0716"
+
+
     stdin, stdout, stderr = ssh.exec_command(jobstatusCommand)
-    outlines = stdout.readlines()
-    #running = ''.join(outlines)
-    #print('running job')
-    #print(running)
+    outlines=stdout.readlines()
+    print(outlines)
+    running = ''.join(outlines)
+    print('running job')
+    print(running)
 
-    for l in outlines[3:-1]:
+
+    for l in outlines[5:]:
         #print(l.split())
-        runningJobID.append(l.split()[1])
+        runningJobID.append(l.split()[0].split(".")[0])
 
-    #print(runningJobID)
-    finishedJobID=[]
-    stdin, stdout, stderr = ssh.exec_command(finishedJobStatusCommand)
-    outlines = stdout.readlines()
-    #finished = ''.join(outlines)
-    #print('finished job')
-    #print(finished)
-    for l in outlines[4:-1]:
-        #print(l.split('|'))
-        finishedJobID.append(l.split('|')[0].lstrip())
+    print(runningJobID)
 
-    #print(finishedJobID)
     #parse log file
     jobinfo=[]
     with open(log,"r") as log:
@@ -172,7 +201,7 @@ def jobStateIMR(log, reqfiles):
     for j in jobinfo:
         if j['ID'] in runningJobID:
             print(str(j['ID'])+" is still running or queuing")
-        elif j['ID'] in finishedJobID:
+        else:
             print(str(j['ID']) + " is finished")
             print("download files to local directory: ./"+str(os.path.basename(j['remote'])))
             local=os.path.basename(j['remote'])
@@ -182,8 +211,9 @@ def jobStateIMR(log, reqfiles):
             for f in reqfiles:
                 localfile=os.path.join(local,f)
                 remotefile=os.path.join(j['remote'],f)
-                #print(localfile)
-                #print(remotefile)
+                print(localfile)
+                print(remotefile)
+                #debug dry run
                 sftp.get(remotefile,localfile)
 
 
@@ -192,8 +222,6 @@ def jobStateIMR(log, reqfiles):
 
     lf.flush()
     lf.close()
-
-
 
 
 
@@ -410,5 +438,4 @@ def jobStateRCCS(log, reqfiles):
 
     lf.flush()
     lf.close()
-
 
