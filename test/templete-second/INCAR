@@ -1,0 +1,41 @@
+SYSTEM = NO_Au111
+
+#reuse wavefunction
+ISTART = 2
+
+PREC   = Accurate  # High/medium/low
+LORBIT = 11      # 10 - Create PROOUT file
+                 # 11 - Create PROOUT file and write LDOS
+#ALGO=FAST
+
+ENCUT  =400
+IBRION = 1      # Ions move according to
+                  # conjugate-gradient algorithm
+                  # IBRION =1 for close to equilibrium
+                  # IBRION =2 for no idea for structure
+NFREE = 15
+POTIM = 0.15
+ISMEAR = 0      # Occupancies 0-gaus -1-fermi
+EDIFF  = 5.E-6  # Convergent about total E
+EDIFFG = -0.02    # Convergent about F
+NSW    = 40     # Max step
+NELM = 200
+NPAR=16
+#LVHAR = .TRUE.
+ISPIN = 2
+LMAXMIX=4
+
+#EMAX=1.5
+#EMIN=-2.5
+#Sigma=0.002
+
+#vdW-type:optb86b-vdW
+GGA = MK
+PARAM1 = 0.1234
+PARAM2 = 1.0000
+LUSE_VDW = .TRUE.
+AGGAC = 0.0000
+LASPH = .TRUE.
+
+ADDGRID= .TRUE.
+LWAVE= .TRUE.
