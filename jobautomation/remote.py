@@ -439,3 +439,41 @@ def jobStateRCCS(log, reqfiles):
     lf.flush()
     lf.close()
 
+def removeFilesRCCS(dirs, removeFiles):
+    '''
+    remove temporary files
+    :param log: log files all job finished & need to remove files
+    :param removeFiles: WAVECAR, CHG etc...
+    :return:
+    '''
+    config_file = os.path.join(os.getenv('HOME'), '.ssh/config')
+    ssh_config = paramiko.SSHConfig()
+    ssh_config.parse(open(config_file, 'r'))
+    lkup = ssh_config.lookup('RCCS')
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.load_system_host_keys()
+    print("what found in config file")
+    print(lkup)
+
+    ssh.connect(
+        lkup['hostname'],
+        username=lkup['user'],
+        key_filename=lkup['identityfile'],
+    )
+
+
+    for i in dirs:
+        #download results
+        for f in removeFiles:
+            remotefile=os.path.join(i,f)
+            print(remotefile)
+            removeCommand = "rm "+remotefile
+            stdin, stdout, stderr = ssh.exec_command(removeCommand)
+
+    ssh.close()
+
+
+
+
