@@ -11,6 +11,8 @@ top=contcar.positions[-1,2]
 
 topLayers=[]
 
+templete=os.listdir('./template-RCCS')
+
 #determine ontop & bridge position
 for _ in contcar.positions:
     if (abs(_[2]-top))  < 0.1 :
@@ -41,8 +43,13 @@ no_orig=Atoms('NO', positions=[[0,0,0],[0,0,d]])
 #create directories for possible transrate, rotation and so on
 #symmetry, off-symmetry case
 
+#for NO1 bridge
 angle1=[30,60,90]
 angle2=[0,30]
+
+#for NO2 ontop
+angle3=[30,60,90]
+angle4=[0,30]
 
 '''
 cell=np.array([[5.0, 0.0, 0.0],
@@ -55,40 +62,51 @@ dirs=[]
 
 for phi in angle1:
     for theta in angle2:
-        no=no_orig.copy()
-        no.rotate(phi, 'y', center=[0,0,d/2.0])
-        no.rotate(theta, 'z',center=[0,0,d/2.0])
+        no1 = no_orig.copy()
+        no1.rotate(phi, 'y', center=[0, 0, d / 2.0])
+        no1.rotate(theta, 'z', center=[0, 0, d / 2.0])
 
-        '''
-        no_print=no.copy()
-        no_print.set_cell(cell, scale_atoms=False)
-        print(no.positions)
-        write(str(phi) + "-" + str(theta)+".vasp", no_print, format='vasp', vasp5=True, direct=True)
-        '''
-
-        #for center ontop
-        dist=1.9
-
-        ontopNO=no.copy()
-        ontopNO.translate(ontopnext)
-        ontopNO.translate([0.0,0.0,dist])
-
-        #for bridge
-        dist=1.8
-        bridgeNO=no.copy()
-        bridgeNO.translate(bridge)
-        bridgeNO.translate([0.0,0.0,dist])
-
-        Surf=contcar.copy()
-        Surf.extend(ontopNO)
-
-        Surf.extend(bridgeNO)
-
-        image.append(Surf)
+        for phi2 in angle3:
+            for theta2 in angle4:
+                no2=no_orig.copy()
+                no2.rotate(phi2, 'y', center=[0,0,d/2.0])
+                no2.rotate(theta2, 'z',center=[0,0,d/2.0])
 
 
-        dirname="angle-"+str(phi)+"-"+str(theta)
-        os.makedirs(dirname, exist_ok=True)
+                #for center ontop
+                dist=1.9
+
+                ontopNO=no2.copy()
+                ontopNO.translate(ontopnext)
+                ontopNO.translate([0.0,0.0,dist])
+
+                #for bridge
+                dist=1.8
+                bridgeNO=no1.copy()
+                bridgeNO.translate(bridge)
+                bridgeNO.translate([0.0,0.0,dist])
+
+                Surf=contcar.copy()
+                Surf.extend(ontopNO)
+
+                Surf.extend(bridgeNO)
+
+                image.append(Surf)
 
 
-        write(dirname+"/POSCAR", Surf, format='vasp', vasp5=True, direct=True)
+                dirname="angle1-"+str(phi)+"-"+str(theta)+"-angle2-"+str(phi2)+"-"+str(theta2)
+                os.makedirs(dirname, exist_ok=True)
+                dirs.append(dirname)
+
+
+                write(dirname+"/POSCAR", Surf, format='vasp', vasp5=True, direct=True, sort=True)
+
+                for file_name in templete:
+                    full_file_name = os.path.join('./template-RCCS', file_name)
+                    if (os.path.isfile(full_file_name)):
+                        target_file_name = os.path.join(dirname, file_name)
+                        shutil.copy(full_file_name, target_file_name)
+
+vaspfiles=os.listdir(dirs[0])
+print(vaspfiles)
+remote.sendDirsToRCCS(dirs=dirs,vaspfiles=vaspfiles)
