@@ -44,12 +44,12 @@ no_orig=Atoms('NO', positions=[[0,0,0],[0,0,d]])
 #symmetry, off-symmetry case
 
 #for NO1 bridge
-angle1=[30,60,90]
-angle2=[0,30]
+angle1=[60]
+angle2=[0]
 
 #for NO2 ontop
-angle3=[30,60,90]
-angle4=[0,30]
+angle3=[60,90]
+angle4=[0]
 
 '''
 cell=np.array([[5.0, 0.0, 0.0],
@@ -74,7 +74,7 @@ for phi in angle1:
 
 
                 #for center ontop
-                dist=1.9
+                dist=2.2
 
                 ontopNO=no2.copy()
                 ontopNO.translate(ontopnext)
@@ -94,7 +94,7 @@ for phi in angle1:
                 image.append(Surf)
 
 
-                dirname="angle1-"+str(phi)+"-"+str(theta)+"-angle2-"+str(phi2)+"-"+str(theta2)
+                dirname="upper-ontop-angle1-"+str(phi)+"-"+str(theta)+"-angle2-"+str(phi2)+"-"+str(theta2)
                 os.makedirs(dirname, exist_ok=True)
                 dirs.append(dirname)
 
@@ -102,7 +102,7 @@ for phi in angle1:
                 write(dirname+"/POSCAR", Surf, format='vasp', vasp5=True, direct=True, sort=True)
 
                 for file_name in templete:
-                    full_file_name = os.path.join('./template-RCCS', file_name)
+                    full_file_name = os.path.join('./templete-RCCS', file_name)
                     if (os.path.isfile(full_file_name)):
                         target_file_name = os.path.join(dirname, file_name)
                         shutil.copy(full_file_name, target_file_name)

@@ -1,0 +1,4 @@
+/lustre/home/users/brx/NO-Au111-search/upper-ontop-angle1-60-0-angle2-60-0
+8671643.cccms1
+/lustre/home/users/brx/NO-Au111-search/upper-ontop-angle1-60-0-angle2-90-0
+8671645.cccms1
