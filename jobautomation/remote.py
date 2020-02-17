@@ -260,7 +260,14 @@ def sendToRCCS(files,dir):
     sftp.close()
     ssh.close()
 
-def sendDirsToRCCS(dirs, vaspfiles):
+def sendDirsToRCCS(dirs, vaspfiles,workingdir):
+    '''
+
+    :param dirs: list of directory to send
+    :param vaspfiles: list of files for vasp calculation
+    :param workingdir: working directry path str at RCCS, i.e. '/lustre/home/users/brx/NO-Au111-search/'
+    :return:
+    '''
 
     config_file = os.path.join(os.getenv('HOME'), '.ssh/config')
     ssh_config = paramiko.SSHConfig()
@@ -281,7 +288,8 @@ def sendDirsToRCCS(dirs, vaspfiles):
     )
 
     sftp = ssh.open_sftp()
-    workingdir='/lustre/home/users/brx/NO-Au111-search/'
+    #remove specify
+    #workingdir='/lustre/home/users/brx/NO-Au111-search/'
     for i in dirs:
         mkdircommand='mkdir '+ workingdir+i
         stdin, stdout, stderr = ssh.exec_command(mkdircommand)

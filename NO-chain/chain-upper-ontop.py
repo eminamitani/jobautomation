@@ -109,4 +109,5 @@ for phi in angle1:
 
 vaspfiles=os.listdir(dirs[0])
 print(vaspfiles)
-remote.sendDirsToRCCS(dirs=dirs,vaspfiles=vaspfiles)
+workingdir='/lustre/home/users/brx/NO-Au111-search/'
+remote.sendDirsToRCCS(dirs=dirs,vaspfiles=vaspfiles,workingdir=workingdir)
