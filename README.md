@@ -1,4 +1,4 @@
-#jobautomation  
+# jobautomation  
 This is a tiny scripting tool to support boring job submission to supercomputer center.
 
 ## requirment
