@@ -9,7 +9,7 @@ see 'resuirements.txt'.
 
 ```bash
 git clone https://github.com/eminamitani/jobautomation.git
-cd cd jobautomation
+cd  jobautomation
 pip install -e .
 ```
 
