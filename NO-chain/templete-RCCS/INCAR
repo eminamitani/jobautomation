@@ -9,18 +9,19 @@ LORBIT = 11      # 10 - Create PROOUT file
 #ALGO=FAST
 
 ENCUT  =400
-IBRION = 1      # Ions move according to
+IBRION = 2      # Ions move according to
                   # conjugate-gradient algorithm
                   # IBRION =1 for close to equilibrium
                   # IBRION =2 for no idea for structure
 NFREE = 15
 POTIM = 0.1
 ISMEAR = 0      # Occupancies 0-gaus -1-fermi
+SIGMA = 0.05
 EDIFF  = 5.E-6  # Convergent about total E
 EDIFFG = -0.02    # Convergent about F
 NSW    = 50     # Max step
-NELM = 200
-NPAR=16
+NELM = 30
+NPAR=20
 #LVHAR = .TRUE.
 ISPIN = 2
 LMAXMIX=4
